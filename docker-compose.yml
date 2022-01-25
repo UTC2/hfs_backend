@@ -1,0 +1,20 @@
+version: "3"
+services:
+  mysql5.5:
+    image: mysql:5.5
+    container_name: ${MYSQL_CONTAINER_NAME_PREFIX}5.5
+    ports:
+      - 3355:3306
+    environment:
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./my.cnf:/root/.my.cnf:ro
+      - ./mysql5.5/conf.d:/etc/mysql/conf.d:ro
+      - ./mysql5.5/logs:/var/log/mysql:rw
+      - ./mysql5.5/initdb.d:/docker-entrypoint-initdb.d:ro
+      - ./common:${MOUNTED_SHARED_DIRECTORY}:ro
+      - ./auto-generate:/auto-generate:rw

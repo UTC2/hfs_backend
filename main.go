@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"log"
 	"os"
 )
 
@@ -13,8 +14,11 @@ type myData struct {
 }
 
 func main() {
-	dsn := "user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
 	dsn := os.Getenv("DBConnectionStr")
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println(db, err)
 }

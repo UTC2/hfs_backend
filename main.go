@@ -8,15 +8,9 @@ import (
 	"os"
 )
 
-type myData struct {
-	Id   int
-	Name string
-}
-
 func main() {
 	dsn := os.Getenv("DBConnectionStr")
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-
 	if err != nil {
 		log.Fatal(err)
 	}

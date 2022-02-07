@@ -1,16 +1,16 @@
 version: "3"
 services:
-  mysql5.5:
-    image: mysql:5.5
-    container_name: ${MYSQL_CONTAINER_NAME_PREFIX}5.5
+  mariadb10.3:
+    image: mariadb:10.3
+    container_name: ${MARIADB_CONTAINER_NAME_PREFIX}10.3
     ports:
-      - 3355:3306
+      - 3313:3306
     env_file:
       - .env
     volumes:
       - ./my.cnf:/root/.my.cnf:ro
-      - ./mysql5.5/conf.d:/etc/mysql/conf.d:ro
-      - ./mysql5.5/logs:/var/log/mysql:rw
-      - ./mysql5.5/initdb.d:/docker-entrypoint-initdb.d:ro
-      - ./common:${MOUNTED_SHARED_DIRECTORY}:ro
+      - ./database/mariadb10.3/conf.d:/etc/mysql/conf.d:ro
+      - ./database/mariadb10.3/logs:/var/log/mysql:rw
+      - ./database/mariadb10.3/initdb.d:/docker-entrypoint-initdb.d:ro
+      - ./initDB:${MOUNTED_SHARED_DIRECTORY}:ro
       - ./auto-generate:/auto-generate:rw

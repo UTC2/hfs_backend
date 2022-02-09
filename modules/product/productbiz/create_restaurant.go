@@ -21,6 +21,7 @@ func (biz *createProductBiz) CreateProduct(ctx context.Context, data *productmod
 	if err := data.Validate(); err != nil {
 		return err
 	}
+
 	err := biz.store.Create(ctx, data)
 	return err
 }

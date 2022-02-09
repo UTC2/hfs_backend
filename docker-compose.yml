@@ -2,7 +2,7 @@ version: "3"
 services:
   mariadb10.3:
     image: mariadb:10.3
-    container_name: ${MARIADB_CONTAINER_NAME_PREFIX}10.3
+    container_name: hfs_database
     ports:
       - 3313:3306
     env_file:

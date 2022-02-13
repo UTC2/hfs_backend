@@ -5,12 +5,12 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"hfs_backend/modules/product/productmodel"
-	"hfs_backend/modules/product/producttransport/ginproduct"
+	_ "hfs_backend/modules/product/producttransport/ginproduct"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
-	"time"
+	_ "time"
 )
 
 func main() {

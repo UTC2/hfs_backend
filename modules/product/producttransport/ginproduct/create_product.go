@@ -23,23 +23,15 @@ func CreateProduct(appCtx component.AppContext) gin.HandlerFunc {
 		}
 
 		store := productstorage.NewSQLStore(appCtx.GetMainDBConnection())
-		biz := productbiz.NewCreateRestaurantBiz(store)
+		biz := productbiz.NewCreateProductBiz(store)
 
-		if err := biz.CreateRestaurant(c.Request.Context(), &data); err != nil {
+		if err := biz.CreateProduct(c.Request.Context(), &data); err != nil {
 			c.JSON(401, gin.H{
 				"error": err.Error(),
 			})
-
 			return
 		}
 
 		c.JSON(http.StatusOK, common.SimpleSuccessResponse(data))
 	}
 }
-
-//type fakeCreateStore struct{}
-//
-//func (fakeCreateStore) Create(ctx context.Context, data *restaurantmodel.RestaurantCreate) error {
-//	data.Id = 10
-//	return nil
-//}

@@ -5,29 +5,31 @@ import (
 	"hfs_backend/common"
 	"hfs_backend/component"
 	"hfs_backend/modules/product/productbiz"
-	"hfs_backend/modules/product/productmodel"
 	"hfs_backend/modules/product/productstorage"
 	"net/http"
+	"strconv"
 )
 
-func CreateProduct(appCtx component.AppContext) gin.HandlerFunc {
+func GetProduct(appCtx component.AppContext) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
-		var data productmodel.ProductCreate
+		id, err := strconv.Atoi(c.Param("id"))
 
-		if err := c.ShouldBind(&data); err != nil {
-			c.JSON(401, gin.H{
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, map[string]interface{}{
 				"error": err.Error(),
 			})
 			return
 		}
 
 		store := productstorage.NewSQLStore(appCtx.GetMainDBConnection())
-		biz := productbiz.NewCreateProductBiz(store)
+		biz := productbiz.NewGetProductBiz(store)
 
-		if err := biz.CreateProduct(c.Request.Context(), &data); err != nil {
-			c.JSON(401, gin.H{
+		data, err := biz.GetProduct(c.Request.Context(), id)
+
+		if err != nil {
+			c.JSON(401, map[string]interface{}{
 				"error": err.Error(),
 			})
 			return

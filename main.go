@@ -4,7 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"hfs_backend/component"
 	"hfs_backend/modules/product/productmodel"
+	"hfs_backend/modules/product/producttransport/ginproduct"
 	_ "hfs_backend/modules/product/producttransport/ginproduct"
 	"log"
 	"net/http"
@@ -36,69 +38,13 @@ func runService(db *gorm.DB) error {
 		})
 	})
 
+	appCtx := component.NewAppContext(db)
 	// CRUD
-
 	products := r.Group("/products")
 	{
-		products.POST("", func(c *gin.Context) {
-
-			var data productmodel.Product
-
-			if err := c.ShouldBind(&data); err != nil {
-				c.JSON(http.StatusUnauthorized, map[string]interface{}{
-					"error": err.Error(),
-				})
-			}
-
-			if err := db.Create(&data).Error; err != nil {
-				c.JSON(http.StatusUnauthorized, map[string]interface{}{
-					"error": err.Error(),
-				})
-			}
-			c.JSON(http.StatusOK, data)
-
-		})
-
-		products.GET("/:id", func(c *gin.Context) {
-			id, err := strconv.Atoi(c.Param("id"))
-
-			if err != nil {
-				c.JSON(http.StatusUnauthorized, map[string]interface{}{
-					"error": err.Error(),
-				})
-				return
-			}
-			var data productmodel.Product
-
-			if err := db.Where("id = ?", id).First(&data).Error; err != nil {
-				c.JSON(http.StatusUnauthorized, map[string]interface{}{
-					"error": err.Error(),
-				})
-			}
-			c.JSON(http.StatusOK, data)
-		})
-
-		products.GET("", func(c *gin.Context) {
-
-			var data []productmodel.Product
-
-			var filter productmodel.ProductFilter
-
-			c.ShouldBind(&filter)
-
-			newDb := db
-
-			if filter.Id > 0 {
-				newDb.Where("id = ?", filter.Id)
-			}
-
-			if err := newDb.First(&data).Error; err != nil {
-				c.JSON(http.StatusUnauthorized, map[string]interface{}{
-					"error": err.Error(),
-				})
-			}
-			c.JSON(http.StatusOK, data)
-		})
+		products.POST("", ginproduct.CreateProduct(appCtx))
+		products.GET("/:id", ginproduct.GetProduct(appCtx))
+		products.GET("", ginproduct.ListProduct(appCtx))
 
 		products.PATCH("/:id", func(c *gin.Context) {
 			id, err := strconv.Atoi(c.Param("id"))
@@ -110,7 +56,7 @@ func runService(db *gorm.DB) error {
 				return
 			}
 
-			var data productmodel.Product
+			var data productmodel.ProductUpdate
 
 			if err := c.ShouldBind(&data); err != nil {
 				c.JSON(401, map[string]interface{}{
@@ -129,7 +75,6 @@ func runService(db *gorm.DB) error {
 
 			c.JSON(http.StatusOK, gin.H{"ok": 1})
 		})
-
 		products.DELETE("/:id", func(c *gin.Context) {
 
 			id, err := strconv.Atoi(c.Param("id"))
@@ -138,7 +83,6 @@ func runService(db *gorm.DB) error {
 				c.JSON(401, map[string]interface{}{
 					"error": err.Error(),
 				})
-
 				return
 			}
 

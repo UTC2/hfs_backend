@@ -20,7 +20,7 @@ type Product struct {
 }
 
 func (Product) TableName() string {
-	return "hfs_products"
+	return "products"
 }
 
 type ProductUpdate struct {

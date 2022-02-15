@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+const EntityName = "product"
+
 type Product struct {
 	common.SQLModel `json:",inline"`
 	sku             string  `json:"sku" gorm:"column:sku;"`

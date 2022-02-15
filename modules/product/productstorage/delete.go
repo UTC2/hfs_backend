@@ -2,6 +2,7 @@ package productstorage
 
 import (
 	"context"
+	"hfs_backend/common"
 	"hfs_backend/modules/product/productmodel"
 )
 
@@ -14,7 +15,7 @@ func (s *sqlStore) SoftDeleteData(ctx context.Context,
 		Updates(map[string]interface{}{
 			"status": 0,
 		}).Error; error != nil {
-		return error
+		return common.ErrDB(error)
 	}
 	return nil
 }

@@ -17,9 +17,7 @@ func GetProduct(appCtx component.AppContext) gin.HandlerFunc {
 		id, err := strconv.Atoi(c.Param("id"))
 
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, map[string]interface{}{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, common.ErrInvalidRequest(err))
 			return
 		}
 
@@ -29,7 +27,7 @@ func GetProduct(appCtx component.AppContext) gin.HandlerFunc {
 		data, err := biz.GetProduct(c.Request.Context(), id)
 
 		if err != nil {
-			c.JSON(401, map[string]interface{}{
+			c.JSON(http.StatusBadRequest, map[string]interface{}{
 				"error": err.Error(),
 			})
 			return

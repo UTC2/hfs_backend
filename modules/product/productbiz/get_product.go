@@ -2,7 +2,7 @@ package productbiz
 
 import (
 	"context"
-	"errors"
+	"hfs_backend/common"
 	"hfs_backend/modules/product/productmodel"
 )
 
@@ -23,10 +23,13 @@ func (biz *getProductBiz) GetProduct(ctx context.Context, id int) (*productmodel
 	data, err := biz.store.FindDataByCondition(ctx, map[string]interface{}{"id": id})
 
 	if err != nil {
-		return nil, err
+		if err != common.RecordNotFound {
+			return nil, common.ErrCannotGetEntity(productmodel.EntityName, err)
+		}
+		return nil, common.ErrCannotGetEntity(productmodel.EntityName, err)
 	}
 	if data.Status == 0 {
-		return nil, errors.New("data deleted")
+		return nil, common.ErrEntityDeleted(productmodel.EntityName, nil)
 	}
 	return data, err
 }

@@ -15,6 +15,7 @@ type createProductBiz struct {
 func NewCreateProductBiz(store CreateProductStore) *createProductBiz {
 	return &createProductBiz{store: store}
 }
+
 func (biz *createProductBiz) CreateProduct(ctx context.Context, data *productmodel.ProductCreate) error {
 
 	if err := data.Validate(); err != nil {

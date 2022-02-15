@@ -45,36 +45,8 @@ func runService(db *gorm.DB) error {
 		products.POST("", ginproduct.CreateProduct(appCtx))
 		products.GET("/:id", ginproduct.GetProduct(appCtx))
 		products.GET("", ginproduct.ListProduct(appCtx))
+		products.PATCH("/:id", ginproduct.UpdateProduct(appCtx))
 
-		products.PATCH("/:id", func(c *gin.Context) {
-			id, err := strconv.Atoi(c.Param("id"))
-
-			if err != nil {
-				c.JSON(401, map[string]interface{}{
-					"error": err.Error(),
-				})
-				return
-			}
-
-			var data productmodel.ProductUpdate
-
-			if err := c.ShouldBind(&data); err != nil {
-				c.JSON(401, map[string]interface{}{
-					"error": err.Error(),
-				})
-				return
-			}
-
-			if err := db.Where("id = ?", id).Updates(&data).Error; err != nil {
-				c.JSON(401, map[string]interface{}{
-					"error": err.Error(),
-				})
-
-				return
-			}
-
-			c.JSON(http.StatusOK, gin.H{"ok": 1})
-		})
 		products.DELETE("/:id", func(c *gin.Context) {
 
 			id, err := strconv.Atoi(c.Param("id"))

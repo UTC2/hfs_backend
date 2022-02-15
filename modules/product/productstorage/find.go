@@ -2,6 +2,8 @@ package productstorage
 
 import (
 	"context"
+	"gorm.io/gorm"
+	"hfs_backend/common"
 	"hfs_backend/modules/product/productmodel"
 )
 
@@ -20,8 +22,10 @@ func (s *sqlStore) FindDataByCondition(
 
 	if err := db.Where(conditions).
 		First(&result).Error; err != nil {
+		if err != gorm.ErrRecordNotFound {
+			return nil, common.RecordNotFound
+		}
 		return nil, err
 	}
-
 	return &result, nil
 }

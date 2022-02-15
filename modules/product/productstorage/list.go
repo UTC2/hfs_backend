@@ -14,7 +14,9 @@ func (s *sqlStore) ListDataByCondition(ctx context.Context, conditions map[strin
 		db = db.Preload(moreKeys[i])
 	}
 
-	db = db.Table(productmodel.Product{}.TableName()).Where(conditions)
+	db = db.Table(productmodel.Product{}.TableName()).
+		Where(conditions).
+		Where("status in (1)")
 
 	if v := filter; v != nil {
 		if v.Id > 0 {

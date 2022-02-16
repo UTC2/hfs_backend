@@ -15,18 +15,12 @@ func ListProduct(appCtx component.AppContext) gin.HandlerFunc {
 
 		var filter productmodel.ProductFilter
 		if err := c.ShouldBind(&filter); err != nil {
-			c.JSON(401, gin.H{
-				"error": err.Error(),
-			})
-			return
+			panic(err)
 		}
 		var paging common.Paging
 
 		if err := c.ShouldBind(&paging); err != nil {
-			c.JSON(401, gin.H{
-				"error": err.Error(),
-			})
-			return
+			panic(err)
 		}
 
 		paging.Fulfill()

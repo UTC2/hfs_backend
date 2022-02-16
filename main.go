@@ -5,12 +5,11 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"hfs_backend/component"
+	"hfs_backend/middleware"
 	"hfs_backend/modules/product/producttransport/ginproduct"
-	_ "hfs_backend/modules/product/producttransport/ginproduct"
 	"log"
 	"net/http"
 	"os"
-	_ "time"
 )
 
 func main() {
@@ -29,14 +28,13 @@ func main() {
 func runService(db *gorm.DB) error {
 
 	r := gin.Default()
-
+	appCtx := component.NewAppContext(db)
+	r.Use(middleware.Recover(appCtx))
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
-
-	appCtx := component.NewAppContext(db)
 	// CRUD
 	products := r.Group("/products")
 	{

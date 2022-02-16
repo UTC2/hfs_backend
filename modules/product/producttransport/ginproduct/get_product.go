@@ -17,8 +17,7 @@ func GetProduct(appCtx component.AppContext) gin.HandlerFunc {
 		id, err := strconv.Atoi(c.Param("id"))
 
 		if err != nil {
-			c.JSON(http.StatusBadRequest, common.ErrInvalidRequest(err))
-			return
+			panic(common.ErrInvalidRequest(err))
 		}
 
 		store := productstorage.NewSQLStore(appCtx.GetMainDBConnection())
@@ -27,10 +26,7 @@ func GetProduct(appCtx component.AppContext) gin.HandlerFunc {
 		data, err := biz.GetProduct(c.Request.Context(), id)
 
 		if err != nil {
-			c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"error": err.Error(),
-			})
-			return
+			panic(err)
 		}
 		c.JSON(http.StatusOK, common.SimpleSuccessResponse(data))
 	}

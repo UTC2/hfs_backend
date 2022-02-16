@@ -14,3 +14,12 @@ services:
       - ./database/mariadb10.3/initdb.d:/docker-entrypoint-initdb.d:ro
       - ./initDB:${MOUNTED_SHARED_DIRECTORY}:ro
       - ./auto-generate:/auto-generate:rw
+  hfs_backend:
+    image: 'hfs_backend'
+      container_name: '${COMPOSE_PROJECT_NAME}-datareceiver'
+      build:
+        context: .
+        dockerfile: Dockerfile
+        args:
+          - NODE_ENV=local
+

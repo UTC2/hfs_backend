@@ -7,6 +7,7 @@ import (
 	"hfs_backend/component"
 	"hfs_backend/middleware"
 	"hfs_backend/modules/product/producttransport/ginproduct"
+	"hfs_backend/modules/upload/uploadtransport/ginupload"
 	"log"
 	"net/http"
 	"os"
@@ -36,6 +37,8 @@ func runService(db *gorm.DB) error {
 		})
 	})
 	// CRUD
+	r.POST("/upload", ginupload.Upload(appCtx))
+
 	products := r.Group("/products")
 	{
 		products.POST("", ginproduct.CreateProduct(appCtx))

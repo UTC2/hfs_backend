@@ -6,18 +6,19 @@ import (
 	"time"
 )
 
-const EntityName = "product"
+const EntityName = "Product"
 
 type Product struct {
 	common.SQLModel `json:",inline"`
-	sku             string  `json:"sku" gorm:"column:sku;"`
-	Name            string  `json:"name" gorm:"column:name;"`
-	Description     string  `json:"description" gorm:"description;"`
-	ProductStatusId int     `json:"product_status_id" gorm:"product_status_id;"`
-	RegularPrice    float64 `json:"regular_price" gorm:"regular_price;"`
-	DiscountPrice   float64 `json:"discount_price" gorm:"discount_price;"`
-	quantity        int     `json:"quantity" gorm:"quantity;"`
-	taxable         int     `json:"taxable" gorm:"taxable;"`
+	Sku             string         `json:"sku" gorm:"column:sku;"`
+	Name            string         `json:"name" gorm:"column:name;"`
+	Description     string         `json:"description" gorm:"description;"`
+	ProductStatusId int            `json:"product_status_id" gorm:"product_status_id;"`
+	RegularPrice    float64        `json:"regular_price" gorm:"regular_price;"`
+	DiscountPrice   float64        `json:"discount_price" gorm:"discount_price;"`
+	Quantity        int            `json:"quantity" gorm:"quantity;"`
+	Taxable         int            `json:"taxable" gorm:"taxable;"`
+	Image           *common.Images `json:"image" gorm:"colum:image;"`
 }
 
 func (Product) TableName() string {
@@ -25,14 +26,13 @@ func (Product) TableName() string {
 }
 
 type ProductUpdate struct {
-	Description     *string    `json:"description" gorm:"description;"`
-	ProductStatusId *int       `json:"product_status_id" gorm:"product_status_id;"`
-	RegularPrice    *float64   `json:"regular_price" gorm:"regular_price;"`
-	DiscountPrice   *float64   `json:"discount_price" gorm:"discount_price;"`
-	quantity        *int       `json:"quantity" gorm:"quantity;"`
-	taxable         *int       `json:"taxable" gorm:"taxable;"`
-	insertAt        *time.Time `json:insert_at gorm:"insert_at;"`
-	updatedAt       *time.Time `json:updated_at gorm:"updated_at;"`
+	Description     *string        `json:"description" gorm:"description;"`
+	ProductStatusId *int           `json:"product_status_id" gorm:"product_status_id;"`
+	RegularPrice    *float64       `json:"regular_price" gorm:"regular_price;"`
+	DiscountPrice   *float64       `json:"discount_price" gorm:"discount_price;"`
+	Quantity        *int           `json:"quantity" gorm:"quantity;"`
+	Taxable         *int           `json:"taxable" gorm:"taxable;"`
+	Image           *common.Images `json:"image" gorm:"colum:image;"`
 }
 
 func (ProductUpdate) TableName() string {
@@ -45,15 +45,14 @@ type ProductCreate struct {
 	RegularPrice    float64   `json:"regular_price" gorm:"regular_price;"`
 	DiscountPrice   float64   `json:"discount_price" gorm:"discount_price;"`
 	Quantity        int       `json:"quantity" gorm:"quantity;"`
-	taxable         int       `json:"taxable" gorm:"taxable;"`
-	insertAt        time.Time `json:insert_at gorm:"insert_at;"`
-	updatedAt       time.Time `json:updated_at gorm:"updated_at;"`
+	Taxable         int       `json:"taxable" gorm:"taxable;"`
+	InsertAt        time.Time `json:"insert_at" gorm:"insert_at;"`
+	UpdatedAt       time.Time `json:"updated_at" gorm:"updated_at;"`
 }
 
 func (ProductCreate) TableName() string {
 	return Product{}.TableName()
 }
-
 func (res *ProductCreate) Validate() error {
 
 	if res.Quantity == 0 {

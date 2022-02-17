@@ -15,8 +15,8 @@ type appCtx struct {
 	upProvider uploadprovider.UploadProvider
 }
 
-func NewAppContext(db *gorm.DB) *appCtx {
-	return &appCtx{db: db}
+func NewAppContext(db *gorm.DB, provider uploadprovider.UploadProvider) *appCtx {
+	return &appCtx{db: db, upProvider: provider}
 }
 
 func (ctx *appCtx) GetMainDBConnection() *gorm.DB {

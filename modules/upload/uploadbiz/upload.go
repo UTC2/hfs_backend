@@ -32,30 +32,34 @@ func NewUploadBiz(provider uploadprovider.UploadProvider, storage CreateImageSto
 }
 func (biz *uploadBiz) Upload(ctx context.Context, data []byte, folder, filename string) (*common.Image, error) {
 	fileByte := bytes.NewBuffer(data)
-	w, h, error := getImageDimension(fileByte)
-	if error != nil {
-		return nil, uploadmodel.ErrFileIsnotImage(error)
+	w, h, err := getImageDimension(fileByte)
+	if err != nil {
+		return nil, uploadmodel.ErrFileIsnotImage(err)
 	}
 	if strings.TrimSpace(folder) == "" {
 		folder = "img"
 	}
 	fileExt := filepath.Ext(filename)
 	fileName := fmt.Sprintf("%d%s", time.Now().Nanosecond(), fileExt)
-	img, error := biz.provider.SaveFileUploaded(ctx, data, fmt.Sprintf("%s/%s", folder, fileName))
-	if error != nil {
-		return nil, uploadmodel.ErrCannotSaveFile(error)
+	img, err := biz.provider.SaveFileUploaded(ctx, data, fmt.Sprintf("%s/%s", folder, fileName))
+
+	if err != nil {
+		return nil, uploadmodel.ErrCannotSaveFile(err)
 	}
+
 	img.Width = w
 	img.Height = h
 	img.Extension = fileExt
+
 	return img, nil
+
 }
 
 func getImageDimension(reader io.Reader) (int, int, error) {
-	img, _, error := image.DecodeConfig(reader)
-	if error != nil {
-		log.Print("err: ", error)
-		return 0, 0, error
+	img, _, err := image.DecodeConfig(reader)
+	if err != nil {
+		log.Print("err: ", err)
+		return 0, 0, err
 	}
 	return img.Width, img.Height, nil
 }

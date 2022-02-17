@@ -3,13 +3,13 @@ module hfs_backend
 go 1.17
 
 require (
+	github.com/aws/aws-sdk-go v1.42.53
 	github.com/gin-gonic/gin v1.7.7
 	gorm.io/driver/mysql v1.0.3
 	gorm.io/gorm v1.20.11
 )
 
 require (
-	github.com/aws/aws-sdk-go v1.42.53 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect

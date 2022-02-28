@@ -1,12 +1,9 @@
 package productmodel
-
 import (
   "hfs_backend/common"
   "strings"
 )
-
 const EntityName = "Product"
-
 type Product struct {
 	common.SQLModel `json:",inline"`
 	Sku             string         `json:"sku" gorm:"column:sku;"`
@@ -17,14 +14,12 @@ type Product struct {
 	DiscountPrice   float64        `json:"discount_price" gorm:"discount_price;"`
 	Quantity        int            `json:"quantity" gorm:"quantity;"`
 	Taxable         int            `json:"taxable" gorm:"taxable;"`
-	productImages   *common.Images `json:"foodimages" gorm:"colum:foodimages;"`
-	LikeCount       int            `json:"like_count" gorm:"-"`
+	productImages   *common.Images `json:"product_images" gorm:"column:product_images;"`
+	likedCount      int             `json:"like_count" gorm:"-"`
 }
-
 func (Product) TableName() string {
 	return "products"
 }
-
 type ProductUpdate struct {
   Sku             string         `json:"sku" gorm:"column:sku;"`
   Description     *string        `json:"description" gorm:"description;"`
@@ -57,7 +52,6 @@ func (ProductCreate) TableName() string {
 }
 func (res *ProductCreate) Validate() error {
   res.Name = strings.TrimSpace(res.Name)
-
   if res.Quantity == 0 {
 		return ErrQuantityMustBePositive
 	}

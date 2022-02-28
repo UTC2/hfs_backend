@@ -1,5 +1,4 @@
 package ginupload
-
 import (
 	"github.com/gin-gonic/gin"
 	"hfs_backend/common"
@@ -7,11 +6,9 @@ import (
 	"hfs_backend/modules/upload/uploadbiz"
 	"net/http"
 )
-
 func Upload(appCtx component.AppContext) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
 		fileHeader, err := ctx.FormFile("file")
-
 		if err != nil {
 			panic(common.ErrInvalidRequest(err))
 		}
@@ -24,13 +21,14 @@ func Upload(appCtx component.AppContext) func(ctx *gin.Context) {
 		}
 
 		defer file.Close()
+
 		dataBytes := make([]byte, fileHeader.Size)
+
 		if _, err := file.Read(dataBytes); err != nil {
 			panic(common.ErrInvalidRequest(err))
 		}
 
-		//imgstore := uploadstorage.NewSqlStore(db)
-		biz := uploadbiz.NewUploadBiz(appCtx.UploadProvider(), nil)
+	  biz := uploadbiz.NewUploadBiz(appCtx.UploadProvider(), nil)
 		img, err := biz.Upload(ctx.Request.Context(), dataBytes, folder, fileHeader.Filename)
 
 		if err != nil {

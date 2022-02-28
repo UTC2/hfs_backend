@@ -26,9 +26,9 @@ func ListProduct(appCtx component.AppContext) gin.HandlerFunc {
 		paging.Fulfill()
 
 		store := productstorage.NewSQLStore(appCtx.GetMainDBConnection())
-		biz := productbiz.NewListProductBiz(store,nil)
+		biz := productbiz.NewListProductBiz(store)
 
-		result, err := biz.ListProduct(c.Request.Context(), &filter, &paging)
+		result, err := biz.ListRestaurant(c.Request.Context(), &filter, &paging)
 
 		if err != nil {
 			c.JSON(401, gin.H{"error": err.Error()})

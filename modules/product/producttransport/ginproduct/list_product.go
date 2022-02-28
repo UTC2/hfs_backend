@@ -7,7 +7,8 @@ import (
 	"hfs_backend/modules/product/productbiz"
 	"hfs_backend/modules/product/productmodel"
 	"hfs_backend/modules/product/productstorage"
-	"net/http"
+  productlikestorage "hfs_backend/modules/productLike/storage"
+  "net/http"
 )
 
 func ListProduct(appCtx component.AppContext) gin.HandlerFunc {
@@ -25,8 +26,9 @@ func ListProduct(appCtx component.AppContext) gin.HandlerFunc {
 
 		paging.Fulfill()
 
-		store := productstorage.NewSQLStore(appCtx.GetMainDBConnection())
-		biz := productbiz.NewListProductBiz(store,nil)
+		store     := productstorage.NewSQLStore(appCtx.GetMainDBConnection())
+		likeStore := productlikestorage.NewSQLStore(appCtx.GetMainDBConnection())
+		biz       := productbiz.NewListProductBiz(store,likeStore)
 
 		result, err := biz.ListProduct(c.Request.Context(), &filter, &paging)
 

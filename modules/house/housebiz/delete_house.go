@@ -1,29 +1,28 @@
-package productbiz
+package housebiz
 
 import (
 	"context"
 	"errors"
-	"hfs_backend/modules/product/productmodel"
-)
+  "hfs_backend/modules/house/housemodel")
 
-type DeleteProductStore interface {
+type DeleteHouseStore interface {
 	FindDataByCondition(
 		ctx context.Context,
 		conditions map[string]interface{},
 		moreKeys ...string,
-	) (*productmodel.Product, error)
+	) (*housemodel.House, error)
 	SoftDeleteData(ctx context.Context,
 		id int,
 	) error
 }
-type deleteProductBiz struct {
-	store DeleteProductStore
+type deleteHouseBiz struct {
+	store DeleteHouseStore
 }
 
-func NewDeleteProductBiz(store DeleteProductStore) *deleteProductBiz {
-	return &deleteProductBiz{store: store}
+func NewDeleteHouseBiz(store DeleteHouseStore) *deleteHouseBiz {
+	return &deleteHouseBiz{store: store}
 }
-func (biz *deleteProductBiz) DeleteProduct(ctx context.Context,
+func (biz *deleteHouseBiz) DeleteHouse(ctx context.Context,
 	id int,
 ) error {
 	oldData, error := biz.store.FindDataByCondition(ctx, map[string]interface{}{"id": id})

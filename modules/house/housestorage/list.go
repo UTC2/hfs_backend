@@ -1,20 +1,23 @@
-package productstorage
+package housestorage
 
 import (
-	"context"
-	"hfs_backend/common"
-	"hfs_backend/modules/product/productmodel"
+  "context"
+  "hfs_backend/common"
+  "hfs_backend/modules/house/housemodel"
 )
 
-func (s *sqlStore) ListDataByCondition(ctx context.Context, conditions map[string]interface{}, filter *productmodel.ProductFilter, paging *common.Paging, moreKeys ...string) ([]productmodel.Product, error) {
+func (s *sqlStore) ListDataByCondition(ctx context.Context,
+  conditions map[string]interface{},
+filter *housemodel.HouseFilter,
+paging *common.Paging, moreKeys ...string) ([]housemodel.House, error) {
 
-	var result []productmodel.Product
+	var result []housemodel.House
 	db := s.db
 	for i := range moreKeys {
 		db = db.Preload(moreKeys[i])
 	}
 
-	db = db.Table(productmodel.Product{}.TableName()).
+	db = db.Table(housemodel.House{}.TableName()).
 		Where(conditions).
 		Where("status in (1)")
 

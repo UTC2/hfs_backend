@@ -1,31 +1,31 @@
-package productbiz
+package housebiz
 
 import (
-	"context"
-	"errors"
-	"hfs_backend/modules/product/productmodel"
+  "context"
+  "errors"
+  "hfs_backend/modules/house/housemodel"
 )
 
-type UpdateProductStore interface {
+type UpdateHouseStore interface {
 	FindDataByCondition(
 		ctx context.Context,
 		conditions map[string]interface{},
 		moreKeys ...string,
-	) (*productmodel.Product, error)
+	) (*housemodel.House, error)
 	UpdateData(
 		ctx context.Context,
 		id int,
-		data *productmodel.ProductUpdate,
+		data *housemodel.HouseUpdate,
 	) error
 }
 type ProductBiz struct {
-	store UpdateProductStore
+	store UpdateHouseStore
 }
 
-func NewUpdateProductBiz(store UpdateProductStore) *ProductBiz {
+func NewUpdateHouseBiz(store UpdateHouseStore) *ProductBiz {
 	return &ProductBiz{store: store}
 }
-func (biz *ProductBiz) UpdateProduct(ctx context.Context, id int, data *productmodel.ProductUpdate) error {
+func (biz *ProductBiz) UpdateHouse(ctx context.Context, id int, data *housemodel.HouseUpdate) error {
 	oldData, error := biz.store.FindDataByCondition(ctx, map[string]interface{}{"id": id})
 	if error != nil {
 		return error

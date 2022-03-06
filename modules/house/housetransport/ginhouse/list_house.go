@@ -1,19 +1,19 @@
-package ginproduct
+package ginhouse
 
 import (
-	"github.com/gin-gonic/gin"
-	"hfs_backend/common"
-	"hfs_backend/component"
-	"hfs_backend/modules/product/productbiz"
-	"hfs_backend/modules/product/productmodel"
-	"hfs_backend/modules/product/productstorage"
-	"net/http"
+  "github.com/gin-gonic/gin"
+  "hfs_backend/common"
+  "hfs_backend/component"
+  "hfs_backend/modules/house/housebiz"
+  "hfs_backend/modules/house/housemodel"
+  "hfs_backend/modules/house/housestorage"
+  "net/http"
 )
 
-func ListProduct(appCtx component.AppContext) gin.HandlerFunc {
+func ListHouse(appCtx component.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		var filter productmodel.ProductFilter
+		var filter housemodel.HouseFilter
 		if err := c.ShouldBind(&filter); err != nil {
 			panic(err)
 		}
@@ -25,10 +25,10 @@ func ListProduct(appCtx component.AppContext) gin.HandlerFunc {
 
 		paging.Fulfill()
 
-		store := productstorage.NewSQLStore(appCtx.GetMainDBConnection())
-		biz := productbiz.NewListProductBiz(store)
+		store := housestorage.NewSQLStore(appCtx.GetMainDBConnection())
+		biz   := housebiz.NewListHouseBiz(store)
 
-		result, err := biz.ListRestaurant(c.Request.Context(), &filter, &paging)
+		result, err := biz.ListHouse(c.Request.Context(), &filter, &paging)
 
 		if err != nil {
 			c.JSON(401, gin.H{"error": err.Error()})

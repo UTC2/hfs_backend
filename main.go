@@ -7,7 +7,8 @@ import (
 	"hfs_backend/component"
 	"hfs_backend/component/uploadprovider"
 	"hfs_backend/middleware"
-	"hfs_backend/modules/product/producttransport/ginproduct"
+  "hfs_backend/modules/house/housetransport/ginhouse"
+  "hfs_backend/modules/product/producttransport/ginproduct"
 	"hfs_backend/modules/upload/uploadtransport/ginupload"
 	"log"
 	"net/http"
@@ -55,5 +56,13 @@ func runService(db *gorm.DB, provider uploadprovider.UploadProvider) error {
 		products.PATCH("/:id", ginproduct.UpdateProduct(appCtx))
 		products.DELETE("/:id", ginproduct.DeleteProduct(appCtx))
 	}
+  houses := r.Group("/houses")
+  {
+    houses.POST("", ginhouse.CreateHouse(appCtx))
+    houses.GET("/:id", ginhouse.GetHouse(appCtx))
+    houses.GET("", ginhouse.ListHouse(appCtx))
+    houses.PATCH("/:id", ginhouse.UpdateHouse(appCtx))
+    houses.DELETE("/:id", ginhouse.DeleteHouse(appCtx))
+  }
 	return r.Run()
 }

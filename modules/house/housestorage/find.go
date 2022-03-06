@@ -1,18 +1,18 @@
-package productstorage
+package housestorage
 
 import (
-	"context"
-	"gorm.io/gorm"
-	"hfs_backend/common"
-	"hfs_backend/modules/product/productmodel"
+  "context"
+  "gorm.io/gorm"
+  "hfs_backend/common"
+  "hfs_backend/modules/house/housemodel"
 )
 
 func (s *sqlStore) FindDataByCondition(
 	ctx context.Context,
 	conditions map[string]interface{},
 	moreKeys ...string,
-) (*productmodel.Product, error) {
-	var result productmodel.Product
+) (*housemodel.House, error) {
+	var result housemodel.House
 
 	db := s.db
 

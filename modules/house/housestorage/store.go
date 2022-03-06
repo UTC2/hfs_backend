@@ -1,4 +1,4 @@
-package productstorage
+package housestorage
 
 import (
 	"gorm.io/gorm"

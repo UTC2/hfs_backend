@@ -35,6 +35,7 @@ type House struct {
   WaterPrice          int             `json:"water_price" gorm:"water_price;"`
   WifiCost            int             `json:"wifi_cost" gorm:"wifi_cost;"`
   RoomImages          *common.Images  `json:"room_images" gorm:"column:room_images;"`
+  ExactRoomAddress    string `json:"exact_room_address" gorm:"exact_room_address;"`
   Status              int             `json:"status" gorm:"status;"`
   likedCount        int               `json:"like_count" gorm:"-"`
 }
@@ -67,9 +68,9 @@ type HouseUpdate struct {
   Balcony             bool            `json:"balcony;" gorm:"column:balcony;"`
   ElectricPrice       int             `json:"electric_price" gorm:"electric_price;"`
   WaterPrice          int             `json:"water_price" gorm:"water_price;"`
-  WifiCost            int             `json:"wifi_cost" gorm:"wifi_cost;"`
-  RoomImages          *common.Images      `json:"room_images" gorm:"column:room_images;"`
-  Status              int             `json:"status" gorm:"status;"`
+  WifiCost            int    `json:"wifi_cost" gorm:"wifi_cost;"`
+  ExactRoomAddress    string `json:"exact_room_address" gorm:"exact_room_address;"`
+  Status              int    `json:"status" gorm:"status;"`
 }
 type HouseCreate struct {
   common.SQLModel `json:",inline"`
@@ -101,7 +102,7 @@ type HouseCreate struct {
   ElectricPrice       int             `json:"electric_price" gorm:"electric_price;"`
   WaterPrice          int             `json:"water_price" gorm:"water_price;"`
   WifiCost            int             `json:"wifi_cost" gorm:"wifi_cost;"`
-  RoomImages          *common.Images      `json:"room_images" gorm:"column:room_images;"`
+  ExactRoomAddress    string `json:"exact_room_address" gorm:"exact_room_address;"`
   Status              int             `json:"status" gorm:"status;"`
 }
 

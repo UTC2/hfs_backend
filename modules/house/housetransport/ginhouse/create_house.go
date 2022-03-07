@@ -14,12 +14,12 @@ func CreateHouse(appCtx component.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var data housemodel.HouseCreate
 		if err := c.ShouldBind(&data); err != nil {
-			c.JSON(401, gin.H{
-				"error": err.Error(),
-			})
-			return
+      panic(common.ErrInvalidRequest(err))
 		}
-		store := housestorage.NewSQLStore(appCtx.GetMainDBConnection())
+    requester := c.MustGet(common.CurrentUser).(common.Requester)
+    data.OwnerId = requester.GetUserId()
+
+    store := housestorage.NewSQLStore(appCtx.GetMainDBConnection())
 		biz   := housebiz.NewCreateHouseBiz(store)
 		if err := biz.CreateHouse(c.Request.Context(), &data); err != nil {
       panic(err)

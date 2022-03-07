@@ -10,7 +10,8 @@ import (
   "hfs_backend/modules/house/housetransport/ginhouse"
   "hfs_backend/modules/product/producttransport/ginproduct"
 	"hfs_backend/modules/upload/uploadtransport/ginupload"
-	"log"
+  "hfs_backend/modules/user/usertransport/ginuser"
+  "log"
 	"net/http"
 	"os"
 )
@@ -23,6 +24,7 @@ func main() {
 	s3Apikey := os.Getenv("S3APIKEY")
 	s3SecretKey := os.Getenv("S3Secretkey")
 	s3Domain := os.Getenv("S3Domain")
+  secretKey := os.Getenv("SYSTEM_SECRET")
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	s3Provider := uploadprovider.NewS3Provider(s3bucketname, s3Region, s3Apikey, s3SecretKey, s3Domain)
@@ -30,15 +32,15 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	if err := runService(db, s3Provider); err != nil {
+	if err := runService(db, s3Provider,secretKey); err != nil {
 		log.Fatalln(err)
 	}
 }
 
-func runService(db *gorm.DB, provider uploadprovider.UploadProvider) error {
+func runService(db *gorm.DB, provider uploadprovider.UploadProvider,secretkey string) error {
 
 	r := gin.Default()
-	appCtx := component.NewAppContext(db, provider)
+	appCtx := component.NewAppContext(db, provider,secretkey)
 	r.Use(middleware.Recover(appCtx))
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -64,5 +66,13 @@ func runService(db *gorm.DB, provider uploadprovider.UploadProvider) error {
     houses.PATCH("/:id", ginhouse.UpdateHouse(appCtx))
     houses.DELETE("/:id", ginhouse.DeleteHouse(appCtx))
   }
+  user := r.Group("/v1")
+  {
+    user.POST("/upload", ginupload.Upload(appCtx))
+    user.POST("/register", ginuser.Register(appCtx))
+    user.POST("/login", ginuser.Login(appCtx))
+    user.GET("/profile", middleware.RequiredAuth(appCtx), ginuser.GetProfile(appCtx))
+  }
+
 	return r.Run()
 }

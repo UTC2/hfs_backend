@@ -80,6 +80,10 @@ func NewAccount(at, rt *tokenprovider.Token) *Account {
   }
 }
 
+type RefreshRequest struct {
+	RefreshToken string `json:"refresh_token" form:"refresh_token"`
+}
+
 var (
   ErrUsernameOrPasswordInvalid = common.NewCustomError(
     errors.New("username or password invalid"),

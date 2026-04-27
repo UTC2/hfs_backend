@@ -2,6 +2,7 @@ package userbiz
 
 import (
 	"context"
+	"log"
 	"strings"
 
 	"hfs_backend/common"
@@ -62,10 +63,12 @@ func (b *loginBusiness) Login(ctx context.Context, data *usermodel.UserLogin) (*
 			// Transparent migration: re-hash with bcrypt and update DB.
 			newHash, err := b.hasher.Hash(data.Password)
 			if err == nil {
-				_ = b.storeUser.UpdateUser(ctx,
+				if updateErr := b.storeUser.UpdateUser(ctx,
 					map[string]interface{}{"id": user.Id},
 					map[string]interface{}{"password": newHash, "salt": ""},
-				)
+				); updateErr != nil {
+					log.Printf("md5_migration_failed user_id=%d err=%v", user.Id, updateErr)
+				}
 			}
 		}
 	}

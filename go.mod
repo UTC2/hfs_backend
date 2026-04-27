@@ -1,12 +1,15 @@
 module hfs_backend
 
-go 1.17
+go 1.21
+
+toolchain go1.24.13
 
 require (
 	github.com/aws/aws-sdk-go v1.42.53
 	github.com/btcsuite/btcutil v1.0.2
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.7
+	github.com/golang-jwt/jwt/v5 v5.3.1
+	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f
 	gorm.io/driver/mysql v1.0.3
 	gorm.io/gorm v1.20.11
 )

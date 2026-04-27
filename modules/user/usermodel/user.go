@@ -2,6 +2,8 @@ package usermodel
 
 import (
   "errors"
+  "net/http"
+
   "hfs_backend/common"
   "hfs_backend/component/tokenprovider"
 )
@@ -80,15 +82,23 @@ func NewAccount(at, rt *tokenprovider.Token) *Account {
   }
 }
 
+type RefreshRequest struct {
+	RefreshToken string `json:"refresh_token" form:"refresh_token"`
+}
+
 var (
-  ErrUsernameOrPasswordInvalid = common.NewCustomError(
+  ErrUsernameOrPasswordInvalid = common.NewFullErrorResponse(
+    http.StatusUnauthorized,
     errors.New("username or password invalid"),
+    "username or password invalid",
     "username or password invalid",
     "ErrUsernameOrPasswordInvalid",
   )
 
-  ErrEmailExisted = common.NewCustomError(
+  ErrEmailExisted = common.NewFullErrorResponse(
+    http.StatusConflict,
     errors.New("email has already existed"),
+    "email has already existed",
     "email has already existed",
     "ErrEmailExisted",
   )

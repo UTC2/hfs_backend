@@ -1,67 +1,58 @@
 package middleware
 
 import (
-  "errors"
-  "fmt"
-  "github.com/gin-gonic/gin"
-  "hfs_backend/common"
-  "hfs_backend/component"
-  "hfs_backend/component/tokenprovider/jwt"
-  "hfs_backend/modules/user/userstorage"
-  "strings"
+	"errors"
+	"strings"
+
+	"github.com/gin-gonic/gin"
+	"hfs_backend/common"
+	"hfs_backend/component"
+	"hfs_backend/component/tokenprovider/jwt"
+	"hfs_backend/modules/user/userstorage"
 )
 
-func ErrWrongAuthHeader(err error) *common.AppError {
-  return common.NewCustomError(
-    err,
-    fmt.Sprintf("wrong authen header"),
-    fmt.Sprintf("ErrWrongAuthHeader"),
-  )
-}
-func extractTokenFromHeaderString(s string) (string, error) {
-  parts := strings.Split(s, " ")
-  //"Authorization" : "Bearer {token}"
-
-  if parts[0] != "Bearer" || len(parts) < 2 || strings.TrimSpace(parts[1]) == "" {
-    return "", ErrWrongAuthHeader(nil)
-  }
-
-  return parts[1], nil
-}
-// 1. Get token from header
-// 2. Validate token and parse to payload
-// 3. From the token payload, we use user_id to find from DB
 func RequiredAuth(appCtx component.AppContext) func(c *gin.Context) {
-  tokenProvider := jwt.NewTokenJWTProvider(appCtx.SecretKey())
+	tokenProvider := jwt.NewTokenJWTProvider(appCtx.SecretKey())
 
-  return func(c *gin.Context) {
-    token, err := extractTokenFromHeaderString(c.GetHeader("Authorization"))
+	return func(c *gin.Context) {
+		token, err := extractToken(c.GetHeader("Authorization"))
+		if err != nil {
+			handlePanic(c, err)
+			return
+		}
 
-    if err != nil {
-      panic(err)
-    }
+		payload, err := tokenProvider.Validate(token)
+		if err != nil {
+			handlePanic(c, common.NewUnauthorized(err, "invalid token", "ErrInvalidToken"))
+			return
+		}
 
-    db := appCtx.GetMainDBConnection()
-    store := userstorage.NewSQLStore(db)
+		db := appCtx.GetMainDBConnection()
+		store := userstorage.NewSQLStore(db)
+		user, err := store.FindUser(c.Request.Context(), map[string]interface{}{"id": payload.UserId})
+		if err != nil {
+			handlePanic(c, common.ErrEntityNotFound("User", err))
+			return
+		}
+		if user.Status == 0 {
+			handlePanic(c, common.ErrNoPermission(errors.New("user has been deleted or banned")))
+			return
+		}
 
-    payload, err := tokenProvider.Validate(token)
-    if err != nil {
-      panic(err)
-    }
+		user.Mask(false)
+		c.Set(common.CurrentUser, user)
+		c.Next()
+	}
+}
 
-    user, err := store.FindUser(c.Request.Context(), map[string]interface{}{"id": payload.UserId})
-
-    if err != nil {
-      panic(err)
-    }
-
-    if user.Status == 0 {
-      panic(common.ErrNoPermission(errors.New("user has been deleted or banned")))
-    }
-
-    user.Mask(false)
-
-    c.Set(common.CurrentUser, user)
-    c.Next()
-  }
+func extractToken(h string) (string, error) {
+	parts := strings.Split(h, " ")
+	if len(parts) < 2 || parts[0] != "Bearer" || strings.TrimSpace(parts[1]) == "" {
+		return "", common.NewUnauthorized(
+			errors.New("missing or malformed Authorization header"),
+			"missing or malformed Authorization header",
+			"ErrWrongAuthHeader",
+		)
+	}
+	return parts[1], nil
 }

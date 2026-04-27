@@ -1,45 +1,56 @@
 package jwt
 
 import (
-  "github.com/dgrijalva/jwt-go"
-  "hfs_backend/component/tokenprovider"
-  "time"
+	"errors"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"hfs_backend/component/tokenprovider"
 )
 
 type jwtProvider struct {
-  secret string
-}
-
-func (j *jwtProvider) Validate(token string) (*tokenprovider.TokenPayload, error) {
-  panic("implement me")
+	secret string
 }
 
 func NewTokenJWTProvider(secret string) *jwtProvider {
-  return &jwtProvider{secret: secret}
+	return &jwtProvider{secret: secret}
 }
+
 type myClaims struct {
-  Payload tokenprovider.TokenPayload `json:"payload"`
-  jwt.StandardClaims
+	Payload tokenprovider.TokenPayload `json:"payload"`
+	jwt.RegisteredClaims
 }
+
 func (j *jwtProvider) Generate(data tokenprovider.TokenPayload, expiry int) (*tokenprovider.Token, error) {
-  // generate the JWT
-  t := jwt.NewWithClaims(jwt.SigningMethodHS256, myClaims{
-    data,
-    jwt.StandardClaims{
-      ExpiresAt: time.Now().Local().Add(time.Second * time.Duration(expiry)).Unix(),
-      IssuedAt:  time.Now().Local().Unix(),
-    },
-  })
+	now := time.Now()
+	t := jwt.NewWithClaims(jwt.SigningMethodHS256, myClaims{
+		Payload: data,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(expiry) * time.Second)),
+			IssuedAt:  jwt.NewNumericDate(now),
+		},
+	})
+	signed, err := t.SignedString([]byte(j.secret))
+	if err != nil {
+		return nil, tokenprovider.ErrEncodingToken
+	}
+	return &tokenprovider.Token{
+		Token:   signed,
+		Expiry:  expiry,
+		Created: now,
+	}, nil
+}
 
-  myToken, err := t.SignedString([]byte(j.secret))
-  if err != nil {
-    return nil, err
-  }
-
-  // return the token
-  return &tokenprovider.Token{
-    Token:   myToken,
-    Expiry:  expiry,
-    Created: time.Now(),
-  }, nil
+func (j *jwtProvider) Validate(token string) (*tokenprovider.TokenPayload, error) {
+	claims := &myClaims{}
+	parsed, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("unexpected signing method")
+		}
+		return []byte(j.secret), nil
+	})
+	if err != nil || !parsed.Valid {
+		return nil, tokenprovider.ErrInvalidToken
+	}
+	return &claims.Payload, nil
 }

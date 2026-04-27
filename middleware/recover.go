@@ -1,27 +1,34 @@
 package middleware
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"hfs_backend/common"
 	"hfs_backend/component"
 )
 
-func Recover(ctx component.AppContext) gin.HandlerFunc {
-	return func(context *gin.Context) {
+func Recover(_ component.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		defer func() {
-			if err := recover(); err != nil {
-				context.Header("content-type", "application/json")
-				if appErr, ok := err.(*common.AppError); ok {
-					context.AbortWithStatusJSON(appErr.StatusCode, appErr)
-					panic(err)
-					return
-				}
-				appErr := common.ErrInternal(err.(error))
-				context.AbortWithStatusJSON(appErr.StatusCode, appErr)
-				panic(err)
-				return
+			if r := recover(); r != nil {
+				handlePanic(c, r)
 			}
 		}()
-		context.Next()
+		c.Next()
 	}
+}
+
+func handlePanic(c *gin.Context, r interface{}) {
+	c.Header("content-type", "application/json")
+	var appErr *common.AppError
+	switch e := r.(type) {
+	case *common.AppError:
+		appErr = e
+	case error:
+		appErr = common.ErrInternal(e)
+	default:
+		appErr = common.ErrInternal(fmt.Errorf("%v", r))
+	}
+	c.AbortWithStatusJSON(appErr.StatusCode, appErr)
 }

@@ -37,42 +37,40 @@ func main() {
 	}
 }
 
-func runService(db *gorm.DB, provider uploadprovider.UploadProvider,secretkey string) error {
-
+func runService(db *gorm.DB, provider uploadprovider.UploadProvider, secretkey string) error {
 	r := gin.Default()
-	appCtx := component.NewAppContext(db, provider,secretkey)
+	appCtx := component.NewAppContext(db, provider, secretkey)
 	r.Use(middleware.Recover(appCtx))
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-	// CRUD
-	r.POST("/upload", ginupload.Upload(appCtx))
 
-	products := r.Group("/products")
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "pong"})
+	})
+
+	v1 := r.Group("/v1")
 	{
-		products.POST("", ginproduct.CreateProduct(appCtx))
-		products.GET("/:id", ginproduct.GetProduct(appCtx))
-		products.GET("", ginproduct.ListProduct(appCtx))
-		products.PATCH("/:id", ginproduct.UpdateProduct(appCtx))
-		products.DELETE("/:id", ginproduct.DeleteProduct(appCtx))
+		// public auth endpoints
+		v1.POST("/register", ginuser.Register(appCtx))
+		v1.POST("/login", ginuser.Login(appCtx))
+		v1.POST("/refresh", ginuser.Refresh(appCtx))
+
+		// authenticated user endpoints
+		v1.GET("/profile", middleware.RequiredAuth(appCtx), ginuser.GetProfile(appCtx))
+		v1.POST("/upload", middleware.RequiredAuth(appCtx), ginupload.Upload(appCtx))
+
+		// products: public read, auth'd write
+		v1.GET("/products", ginproduct.ListProduct(appCtx))
+		v1.GET("/products/:id", ginproduct.GetProduct(appCtx))
+		v1.POST("/products", middleware.RequiredAuth(appCtx), ginproduct.CreateProduct(appCtx))
+		v1.PATCH("/products/:id", middleware.RequiredAuth(appCtx), ginproduct.UpdateProduct(appCtx))
+		v1.DELETE("/products/:id", middleware.RequiredAuth(appCtx), ginproduct.DeleteProduct(appCtx))
+
+		// houses: public read, auth'd write
+		v1.GET("/houses", ginhouse.ListHouse(appCtx))
+		v1.GET("/houses/:id", ginhouse.GetHouse(appCtx))
+		v1.POST("/houses", middleware.RequiredAuth(appCtx), ginhouse.CreateHouse(appCtx))
+		v1.PATCH("/houses/:id", middleware.RequiredAuth(appCtx), ginhouse.UpdateHouse(appCtx))
+		v1.DELETE("/houses/:id", middleware.RequiredAuth(appCtx), ginhouse.DeleteHouse(appCtx))
 	}
-  houses := r.Group("/houses")
-  {
-    houses.POST("", ginhouse.CreateHouse(appCtx))
-    houses.GET("/:id", ginhouse.GetHouse(appCtx))
-    houses.GET("", ginhouse.ListHouse(appCtx))
-    houses.PATCH("/:id", ginhouse.UpdateHouse(appCtx))
-    houses.DELETE("/:id", ginhouse.DeleteHouse(appCtx))
-  }
-  user := r.Group("/v1")
-  {
-    user.POST("/upload", ginupload.Upload(appCtx))
-    user.POST("/register", ginuser.Register(appCtx))
-    user.POST("/login", ginuser.Login(appCtx))
-    user.GET("/profile", middleware.RequiredAuth(appCtx), ginuser.GetProfile(appCtx))
-  }
 
 	return r.Run()
 }

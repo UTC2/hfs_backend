@@ -23,7 +23,7 @@ func (Image) TableName() string {
 func (j *Image) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)
 	if !ok {
-		return errors.New(fmt.Sprintf("Failed to unmarshal JSONB value", value))
+		return errors.New(fmt.Sprintf("Failed to unmarshal JSONB value: %v", value))
 	}
 	var img Image
 	if err := json.Unmarshal(bytes, &img); err != nil {
@@ -44,7 +44,7 @@ type Images []Image
 func (j *Images) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)
 	if !ok {
-		return errors.New(fmt.Sprintf("Failed to unmarshal JSONB value", value))
+		return errors.New(fmt.Sprintf("Failed to unmarshal JSONB value: %v", value))
 	}
 	var img []Image
 	if err := json.Unmarshal(bytes, &img); err != nil {

@@ -1,26 +1,24 @@
 package common
 
 import (
-  "math/rand"
-  "time"
+	"crypto/rand"
+	"math/big"
 )
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-func randSequence(n int) string {
-  b := make([]rune, n)
-
-  s1 := rand.NewSource(time.Now().UnixNano())
-  r1 := rand.New(s1)
-
-  for i := range b {
-    b[i] = letters[r1.Intn(99999)%len(letters)]
-  }
-  return string(b)
-}
 
 func GenSalt(length int) string {
-  if length < 0 {
-    length = 50
-  }
-  return randSequence(length)
+	if length <= 0 {
+		length = 50
+	}
+	b := make([]rune, length)
+	max := big.NewInt(int64(len(letters)))
+	for i := range b {
+		n, err := rand.Int(rand.Reader, max)
+		if err != nil {
+			panic(err) // crypto/rand.Reader should not fail; if it does, abort
+		}
+		b[i] = letters[n.Int64()]
+	}
+	return string(b)
 }
